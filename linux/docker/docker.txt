@@ -1,0 +1,8 @@
+docker run -d --name <container-name> -p local-port:docker-port <docker-image>
+docker exec -it <container-name> /bin/bash
+docker commit <container-name> <image-name>:<version>
+
+docker save <image-name>:<version> -o <file>
+docker load < <file>
+
+docker run --restart=unless-stopped --name openspeedtest -d -p 3000:3000 -p 3001:3001 openspeedtest/latest

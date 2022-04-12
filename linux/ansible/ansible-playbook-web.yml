@@ -1,0 +1,104 @@
+---
+- hosts: all
+  tasks:
+    - name: Install packages
+      apt:
+       pkg:
+        - git
+        - docker.io
+        - ufw
+        - docker-compose
+       state: present
+       update_cache: true
+    - name: UFW ports allow
+      community.general.ufw:
+       rule: allow
+       port: '22,80,8080,1834'
+       proto: tcp
+       state: enabled
+- hosts: deb_srv02
+  tasks:
+    - name: create directory
+      file:
+        path: /root/web
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Send docker-compose file to web02
+      copy:
+        src: /root/srv02/docker-compose.yml
+        dest: /root/web/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Send docker image file to web02
+      copy:
+        src: /root/srv02/web_srv02
+        dest: /root/web/web_srv02
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Import docker-image
+      ansible.builtin.shell: docker load < /root/web/web_srv02
+
+- hosts: deb_srv03
+  tasks:
+    - name: create directory
+      file:
+        path: /root/web
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Send docker-compose file to web03
+      copy:
+        src: /root/srv03/docker-compose.yml
+        dest: /root/web/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Send docker image file to web03
+      copy:
+        src: /root/srv03/web_srv03
+        dest: /root/web/web_srv03
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Import docker-image
+      ansible.builtin.shell: docker load < /root/web/web_srv03
+- hosts: web
+  tasks:
+    - name: start docker-compose script
+      ansible.builtin.shell: docker-compose up -d
+      args:
+        chdir: /root/web/
+- hosts: balancer
+  tasks:
+    - name: create directory
+      file:
+        path: /root/web
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Send docker-compose file to balancer
+      copy:
+        src: /root/balancer/docker-compose.yml
+        dest: /root/web/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Send docker image file to balancer
+      copy:
+        src: /root/balancer/web_balance
+        dest: /root/web/web_balance
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Import docker-image
+      ansible.builtin.shell: docker load < /root/web/web_balance
+    - name: start docker-compose script
+      ansible.builtin.shell: docker-compose up -d
+       args:
+        chdir: /root/web/

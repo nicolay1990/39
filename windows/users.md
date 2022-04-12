@@ -1,0 +1,3 @@
+```
+$department=Read-Host 'OU' $number=Read-Host 'Count' $org='OU=' + $department + ',DC=Kazan,DC=wsr' $count=1..$number foreach ($i in $count) { New-Item -ItemType 'directory' -Path ('\SRV1.Kazan.wsr\Shares' + $department + '' + $department + '' + $i) -Force New-AdUser -Name ($department + '' + $i) -UserPrincipalName ($department + '' + $i) -Path $org -Enabled $True -AccountPassword (ConvertTo-SecureString ('P@ssw0rd' + $i) -AsPlainText -force) -passThru -HomeDrive 'U' -HomeDirectory ('\SRV1.Kazan.wsr\Shares' + $department + '' + $department + '' + $i) } $vse=Read-Host '....................................................'
+```

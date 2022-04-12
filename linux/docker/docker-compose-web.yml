@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+  web:
+    image: web:0.2
+    ports:
+      - "8080:80"
+    restart: always

@@ -1,0 +1,26 @@
+- hosts: all
+  tasks:
+    - name: Install web server
+      apt: pkg=nginx state=present update_cache=true
+    - name: Delete file default configuration
+      file:
+       path: /etc/nginx/sites-enabled/default
+       state: absent
+    - name: Creating a config file
+      copy:
+         dest: "/etc/nginx/conf.d/main.conf"
+         content: |
+          server {
+           listen 80;
+            location / {
+             root /var/www/html;
+           }
+          }
+    - name: Creating a content file
+      copy:
+        dest: "/var/www/html/index.html"
+        content: |
+         how did it happen
+    - name: restart nginx
+      service: name=nginx state=restarted
+
